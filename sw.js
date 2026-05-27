@@ -7,9 +7,15 @@ const CACHE_NAME = 'lab-8-starter';
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      // B6. TODO - Add all of the URLs from RECIPE_URLs here so that they are
-      //            added to the cache when the ServiceWorker is installed
-      return cache.addAll([]);
+      // B6 
+      return cache.addAll([
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/1_50-thanksgiving-side-dishes.json',
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/2_roasting-turkey-breast-with-stuffing.json',
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/3_moms-cornbread-stuffing.json',
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/4_50-indulgent-thanksgiving-side-dishes-for-any-holiday-gathering.json',
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/5_healthy-thanksgiving-recipe-crockpot-turkey-breast.json',
+      'https://emilyynguyen.github.io/Lab8_Starter/recipes/6_one-pot-thanksgiving-dinner.json',
+      ]);
     })
   );
 });
@@ -32,9 +38,19 @@ self.addEventListener('fetch', function (event) {
   //       fetch(event.request)
   // https://developer.chrome.com/docs/workbox/caching-strategies-overview/
   /*******************************/
-  // B7. TODO - Respond to the event by opening the cache using the name we gave
-  //            above (CACHE_NAME)
-  // B8. TODO - If the request is in the cache, return with the cached version.
-  //            Otherwise fetch the resource, add it to the cache, and return
-  //            network response.
+  // B7
+  event.respondWith(
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.match(event.request).then(function (cachedResponse) {
+        // B8
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request).then(function (networkResponse) {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      });
+    })
+  );
 });
